@@ -22,7 +22,7 @@ app.use((0, cors_1.default)({
     origin: [
         'http://localhost:5173',
         'https://porfolio-admin-client.vercel.app',
-        'https://portfolio-alamin1.vercel.app',
+        'https://portfolio-alamin-dev.vercel.app',
     ],
     credentials: true,
 }));
