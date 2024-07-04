@@ -1,4 +1,4 @@
-import express, { Application, NextFunction, Request, Response } from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
@@ -8,7 +8,11 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: ['http://localhost:5173'],
+    origin: [
+      'http://localhost:5173',
+      'https://porfolio-admin-client.vercel.app',
+      'https://portfolio-alamin1.vercel.app',
+    ],
     credentials: true,
   }),
 );
@@ -121,8 +125,7 @@ async function run() {
       );
       res.send({ token: accessToken });
     });
-  } 
-  finally {
+  } finally {
   }
 }
 run().catch(console.dir);

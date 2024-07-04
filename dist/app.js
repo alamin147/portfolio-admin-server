@@ -19,7 +19,11 @@ const mongodb_1 = require("mongodb");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
-    origin: ['http://localhost:5173'],
+    origin: [
+        'http://localhost:5173',
+        'https://porfolio-admin-client.vercel.app',
+        'https://portfolio-alamin1.vercel.app',
+    ],
     credentials: true,
 }));
 app.get('/', (req, res) => {
