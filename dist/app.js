@@ -17,6 +17,7 @@ const cors_1 = __importDefault(require("cors"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongodb_1 = require("mongodb");
 const app = (0, express_1.default)();
+const nodemailer = require('nodemailer');
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
     origin: [
@@ -48,6 +49,7 @@ function run() {
             const projects = client.db('portfolio-admin-server').collection('projects');
             const skills = client.db('portfolio-admin-server').collection('skills');
             const blogs = client.db('portfolio-admin-server').collection('blogs');
+            const cpProfiles = client.db('portfolio-admin-server').collection('cpProfiles');
             // projects
             app.post('/project', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const body = req.body;
@@ -85,22 +87,43 @@ function run() {
                 const result = yield blogs.deleteOne({ _id: new mongodb_1.ObjectId(id) });
                 res.send(result);
             }));
-            // skills
-            app.post('/skill', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            // cpProfiles
+            app.post('/cpProfile', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const body = req.body;
-                const result = yield skills.insertOne(body);
+                const result = yield cpProfiles.insertOne(body);
                 res.send(result);
             }));
-            app.get('/skill', (req, res) => __awaiter(this, void 0, void 0, function* () {
-                const result = yield skills.find().toArray();
-                // console.log(result)
+            app.get('/cpProfile', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const result = yield cpProfiles.find().toArray();
                 res.send(result);
             }));
-            app.delete('/skill/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            app.delete('/cpProfile/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const id = req.params.id;
-                const result = yield skills.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+                const result = yield cpProfiles.deleteOne({ _id: new mongodb_1.ObjectId(id) });
                 res.send(result);
             }));
+            app.patch('/cpProfile/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const id = req.params.id;
+                const body = req.body;
+                const result = yield cpProfiles.updateOne({ _id: new mongodb_1.ObjectId(id) }, { $set: body });
+                res.send(result);
+            }));
+            // skills
+            // app.post('/skill', async (req, res) => {
+            //   const body = req.body;
+            //   const result = await skills.insertOne(body);
+            //   res.send(result);
+            // });
+            // app.get('/skill', async (req, res) => {
+            //   const result = await skills.find().toArray();
+            //   // console.log(result)
+            //   res.send(result);
+            // });
+            // app.delete('/skill/:id', async (req, res) => {
+            //   const id = req.params.id;
+            //   const result = await skills.deleteOne({ _id: new ObjectId(id) });
+            //   res.send(result);
+            // });
             // user
             app.post('/login', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const userData = req.body;
@@ -121,6 +144,39 @@ function run() {
                     expiresIn: '100d',
                 });
                 res.send({ token: accessToken });
+            }));
+            app.post('/send-mail', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const mails = req.body;
+                    // console.log({ mails });
+                    const transporter = nodemailer.createTransport({
+                        host: 'smtp.gmail.com',
+                        service: 'gmail',
+                        port: 587,
+                        secure: false,
+                        auth: {
+                            user: process.env.USER,
+                            pass: process.env.PASS,
+                        },
+                    });
+                    yield transporter.sendMail({
+                        from: `${mails.name} <${process.env.USER}> `,
+                        replyTo: mails.email,
+                        to: process.env.USER,
+                        subject: mails.subject,
+                        text: mails.message,
+                    });
+                    res.json({
+                        success: true,
+                        message: `Email sent successfully to ${process.env.USER}.`,
+                    });
+                }
+                catch (error) {
+                    res.json({
+                        success: false,
+                        message: `Email could not sent. Please try again.`,
+                    });
+                }
             }));
         }
         finally {
