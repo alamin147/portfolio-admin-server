@@ -92,6 +92,10 @@ async function run() {
         const result = await cpProfiles.find().toArray();
         res.send(result);
         });
+    app.get('/cpProfiles', async (req, res) => {
+        const result = await cpProfiles.find().toArray();
+        res.send(result);
+    });
     app.get('/cpProfile/:id', async (req, res) => {
         const id = req.params.id;
         const result = await cpProfiles.findOne({ _id: new ObjectId(id) });

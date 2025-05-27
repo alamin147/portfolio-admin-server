@@ -97,6 +97,10 @@ function run() {
                 const result = yield cpProfiles.find().toArray();
                 res.send(result);
             }));
+            app.get('/cpProfiles', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const result = yield cpProfiles.find().toArray();
+                res.send(result);
+            }));
             app.get('/cpProfile/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const id = req.params.id;
                 const result = yield cpProfiles.findOne({ _id: new mongodb_1.ObjectId(id) });
