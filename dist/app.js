@@ -16,14 +16,16 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mongodb_1 = require("mongodb");
+const dotenv_1 = __importDefault(require("dotenv"));
 const app = (0, express_1.default)();
 const nodemailer = require('nodemailer');
+dotenv_1.default.config();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
     origin: [
         'http://localhost:5173',
-        'https://porfolio-admin-client.vercel.app',
-        'https://portfolio-alamin-dev.vercel.app',
+        `${process.env.ADMIN_URI}`,
+        `${process.env.CLIENT_URI}`,
     ],
     credentials: true,
 }));

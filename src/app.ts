@@ -2,21 +2,24 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
+import dotenv from 'dotenv';
 const app: Application = express();
 const nodemailer = require('nodemailer');
 
+dotenv.config();
 app.use(express.json());
 
 app.use(
   cors({
     origin: [
       'http://localhost:5173',
-      'https://porfolio-admin-client.vercel.app',
-      'https://portfolio-alamin-dev.vercel.app',
+      `${process.env.ADMIN_URI}`,
+      `${process.env.CLIENT_URI}`,
     ],
     credentials: true,
   }),
 );
+
 
 app.get('/', (req: Request, res: Response) => {
   res.json({
