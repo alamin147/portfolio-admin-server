@@ -15,6 +15,7 @@ app.use(
       'http://localhost:5173',
       `${process.env.ADMIN_URI}`,
       `${process.env.CLIENT_URI}`,
+      `${process.env.CLIENT_URI2}`,
     ],
     credentials: true,
   }),
