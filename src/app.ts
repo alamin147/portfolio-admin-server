@@ -80,11 +80,76 @@ async function run() {
       const result = await blogs.find().toArray();
       res.send(result);
     });
+    app.get('/blog/comments/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const blog = await blogs.findOne(
+      { _id: new ObjectId(id) },
+      { projection: { comments: 1 } }
+    );
+
+    if (blog) {
+      res.status(200).json({
+        success: true,
+        comments: blog.comments || []
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Blog not found"
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch comments"
+    });
+  }
+});
     app.delete('/blog/:id', async (req, res) => {
       const id = req.params.id;
       const result = await blogs.deleteOne({ _id: new ObjectId(id) });
       res.send(result);
     });
+    //comments for blogs
+    app.post('/blog/comments/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { name, comment } = req.body;
+
+    const newComment = {
+      _id: new ObjectId(),
+      name,
+      comment,
+      createdAt: new Date()
+    };
+
+    const result = await blogs.updateOne(
+      { _id: new ObjectId(id) },
+      { $push: { comments: newComment } }
+    );
+
+    if (result.modifiedCount > 0) {
+      res.status(200).json({
+        success: true,
+        comment: newComment,
+        message: "Comment added successfully"
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Blog not found"
+      });
+    }
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to add comment"
+    });
+  }
+});
 
 // cpProfiles
     app.post('/cpProfile', async (req, res) => {
@@ -166,6 +231,74 @@ async function run() {
       );
       res.send({ token: accessToken });
     });
+
+// blog like
+app.post('/blog/like/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const result = await blogs.updateOne(
+      { _id: new ObjectId(id) },
+      { $inc: { likes: 1 } }
+    );
+
+    if (result.modifiedCount > 0) {
+      // Get updated blog to return current likes count
+      const updatedBlog = await blogs.findOne({ _id: new ObjectId(id) });
+
+      res.status(200).json({
+        success: true,
+        likes: updatedBlog.likes || 1,
+        message: "Blog liked successfully"
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Blog not found"
+      });
+    }
+  } catch (error) {
+    console.error('Error liking blog:', error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to like blog"
+    });
+  }
+});
+//blog love
+app.post('/blog/love/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const result = await blogs.updateOne(
+      { _id: new ObjectId(id) },
+      { $inc: { loves: 1 } }
+    );
+
+    if (result.modifiedCount > 0) {
+      // Get updated blog to return current loves count
+      const updatedBlog = await blogs.findOne({ _id: new ObjectId(id) });
+
+      res.status(200).json({
+        success: true,
+        loves: updatedBlog.loves || 1,
+        message: "Blog loved successfully"
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "Blog not found"
+      });
+    }
+  } catch (error) {
+    console.error('Error loving blog:', error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to love blog"
+    });
+  }
+});
+
 
     type TInputs = {
       name: string;
