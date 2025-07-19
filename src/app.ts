@@ -70,8 +70,82 @@ async function run() {
       const result = await projects.deleteOne({ _id: new ObjectId(id) });
       res.send(result);
     });
-
     // blogs
+    const sanitizeHtml = require("sanitize-html"); // Move import to top of file
+
+// Configure sanitize-html options
+    const sanitizeOptions = {
+  allowedTags: [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'p', 'br', 'strong', 'em', 'u', 's',
+    'ol', 'ul', 'li',
+    'blockquote', 'code', 'pre',
+    'a', 'img'
+  ],
+  allowedAttributes: {
+    'a': ['href', 'target'],
+    'img': ['src', 'alt', 'width', 'height'],
+    '*': ['class', 'style'] // Be careful with style attribute
+  },
+  allowedSchemes: ['http', 'https', 'mailto'],
+  allowedSchemesByTag: {
+    img: ['http', 'https', 'data']
+  }
+    };
+
+    app.post("/blog-editor", async (req, res) => {
+  try {
+    const { content } = req.body;
+
+    // Validate content
+    if (!content || typeof content !== 'string' || !content.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Content is required and must be a non-empty string"
+      });
+    }
+
+    // Sanitize HTML to prevent XSS
+    const safeContent = sanitizeHtml(content.trim(), sanitizeOptions);
+
+    // Validate sanitized content isn't empty
+    if (!safeContent.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Content contains no valid HTML elements"
+      });
+    }
+
+    // Insert into database (assuming blogs is your MongoDB collection)
+    const result = await blogs.insertOne({
+      des: safeContent,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    // Check if insertion was successful
+    if (!result.insertedId) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to save blog post"
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: "Blog post created successfully",
+      blogId: result.insertedId
+    });
+
+  } catch (error) {
+    console.error("Error creating blog post:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+    });
+
     app.post('/blog', async (req, res) => {
       const body = req.body;
       const result = await blogs.insertOne(body);
@@ -152,7 +226,7 @@ async function run() {
   }
 });
 
-// cpProfiles
+    // cpProfiles
     app.post('/cpProfile', async (req, res) => {
         const body = req.body;
         const result = await cpProfiles.insertOne(body);

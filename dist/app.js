@@ -26,6 +26,7 @@ app.use((0, cors_1.default)({
         'http://localhost:5173',
         `${process.env.ADMIN_URI}`,
         `${process.env.CLIENT_URI}`,
+        `${process.env.CLIENT_URI2}`,
     ],
     credentials: true,
 }));
@@ -75,6 +76,72 @@ function run() {
                 res.send(result);
             }));
             // blogs
+            const sanitizeHtml = require("sanitize-html"); // Move import to top of file
+            // Configure sanitize-html options
+            const sanitizeOptions = {
+                allowedTags: [
+                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                    'p', 'br', 'strong', 'em', 'u', 's',
+                    'ol', 'ul', 'li',
+                    'blockquote', 'code', 'pre',
+                    'a', 'img'
+                ],
+                allowedAttributes: {
+                    'a': ['href', 'target'],
+                    'img': ['src', 'alt', 'width', 'height'],
+                    '*': ['class', 'style'] // Be careful with style attribute
+                },
+                allowedSchemes: ['http', 'https', 'mailto'],
+                allowedSchemesByTag: {
+                    img: ['http', 'https', 'data']
+                }
+            };
+            app.post("/blog-editor", (req, res) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const { content } = req.body;
+                    // Validate content
+                    if (!content || typeof content !== 'string' || !content.trim()) {
+                        return res.status(400).json({
+                            success: false,
+                            message: "Content is required and must be a non-empty string"
+                        });
+                    }
+                    // Sanitize HTML to prevent XSS
+                    const safeContent = sanitizeHtml(content.trim(), sanitizeOptions);
+                    // Validate sanitized content isn't empty
+                    if (!safeContent.trim()) {
+                        return res.status(400).json({
+                            success: false,
+                            message: "Content contains no valid HTML elements"
+                        });
+                    }
+                    // Insert into database (assuming blogs is your MongoDB collection)
+                    const result = yield blogs.insertOne({
+                        des: safeContent,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    });
+                    // Check if insertion was successful
+                    if (!result.insertedId) {
+                        return res.status(500).json({
+                            success: false,
+                            message: "Failed to save blog post"
+                        });
+                    }
+                    res.status(201).json({
+                        success: true,
+                        message: "Blog post created successfully",
+                        blogId: result.insertedId
+                    });
+                }
+                catch (error) {
+                    console.error("Error creating blog post:", error);
+                    res.status(500).json({
+                        success: false,
+                        message: "Internal server error"
+                    });
+                }
+            }));
             app.post('/blog', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const body = req.body;
                 const result = yield blogs.insertOne(body);
@@ -84,10 +151,69 @@ function run() {
                 const result = yield blogs.find().toArray();
                 res.send(result);
             }));
+            app.get('/blog/comments/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const id = req.params.id;
+                    const blog = yield blogs.findOne({ _id: new mongodb_1.ObjectId(id) }, { projection: { comments: 1 } });
+                    if (blog) {
+                        res.status(200).json({
+                            success: true,
+                            comments: blog.comments || []
+                        });
+                    }
+                    else {
+                        res.status(404).json({
+                            success: false,
+                            message: "Blog not found"
+                        });
+                    }
+                }
+                catch (error) {
+                    console.error('Error fetching comments:', error);
+                    res.status(500).json({
+                        success: false,
+                        message: "Failed to fetch comments"
+                    });
+                }
+            }));
             app.delete('/blog/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const id = req.params.id;
                 const result = yield blogs.deleteOne({ _id: new mongodb_1.ObjectId(id) });
                 res.send(result);
+            }));
+            //comments for blogs
+            app.post('/blog/comments/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const id = req.params.id;
+                    const { name, comment } = req.body;
+                    const newComment = {
+                        _id: new mongodb_1.ObjectId(),
+                        name,
+                        comment,
+                        createdAt: new Date()
+                    };
+                    const result = yield blogs.updateOne({ _id: new mongodb_1.ObjectId(id) }, { $push: { comments: newComment } });
+                    if (result.modifiedCount > 0) {
+                        res.status(200).json({
+                            success: true,
+                            comment: newComment,
+                            message: "Comment added successfully"
+                        });
+                    }
+                    else {
+                        res.status(404).json({
+                            success: false,
+                            message: "Blog not found"
+                        });
+                    }
+                }
+                catch (error) {
+                    console.error('Error adding comment:', error);
+                    res.status(500).json({
+                        success: false,
+                        message: "Failed to add comment"
+                    });
+                }
             }));
             // cpProfiles
             app.post('/cpProfile', (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -155,6 +281,64 @@ function run() {
                     expiresIn: '100d',
                 });
                 res.send({ token: accessToken });
+            }));
+            // blog like
+            app.post('/blog/like/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const id = req.params.id;
+                    const result = yield blogs.updateOne({ _id: new mongodb_1.ObjectId(id) }, { $inc: { likes: 1 } });
+                    if (result.modifiedCount > 0) {
+                        // Get updated blog to return current likes count
+                        const updatedBlog = yield blogs.findOne({ _id: new mongodb_1.ObjectId(id) });
+                        res.status(200).json({
+                            success: true,
+                            likes: updatedBlog.likes || 1,
+                            message: "Blog liked successfully"
+                        });
+                    }
+                    else {
+                        res.status(404).json({
+                            success: false,
+                            message: "Blog not found"
+                        });
+                    }
+                }
+                catch (error) {
+                    console.error('Error liking blog:', error);
+                    res.status(500).json({
+                        success: false,
+                        message: "Failed to like blog"
+                    });
+                }
+            }));
+            //blog love
+            app.post('/blog/love/:id', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const id = req.params.id;
+                    const result = yield blogs.updateOne({ _id: new mongodb_1.ObjectId(id) }, { $inc: { loves: 1 } });
+                    if (result.modifiedCount > 0) {
+                        // Get updated blog to return current loves count
+                        const updatedBlog = yield blogs.findOne({ _id: new mongodb_1.ObjectId(id) });
+                        res.status(200).json({
+                            success: true,
+                            loves: updatedBlog.loves || 1,
+                            message: "Blog loved successfully"
+                        });
+                    }
+                    else {
+                        res.status(404).json({
+                            success: false,
+                            message: "Blog not found"
+                        });
+                    }
+                }
+                catch (error) {
+                    console.error('Error loving blog:', error);
+                    res.status(500).json({
+                        success: false,
+                        message: "Failed to love blog"
+                    });
+                }
             }));
             app.post('/send-mail', (req, res) => __awaiter(this, void 0, void 0, function* () {
                 try {
