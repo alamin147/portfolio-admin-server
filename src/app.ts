@@ -95,7 +95,7 @@ async function run() {
 
     app.post("/blog-editor", async (req, res) => {
   try {
-    const { content } = req.body;
+    const { title,category,imgUrl,shortDes,time,content } = req.body;
 
     // Validate content
     if (!content || typeof content !== 'string' || !content.trim()) {
@@ -119,6 +119,12 @@ async function run() {
     // Insert into database (assuming blogs is your MongoDB collection)
     const result = await blogs.insertOne({
       des: safeContent,
+      title: title.trim(),
+      category: category.trim(),
+        imgUrl: imgUrl.trim(),
+        shortDes: shortDes.trim(),
+        time: time.trim(),
+        no: Math.floor(Math.random() * 100),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
