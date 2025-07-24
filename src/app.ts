@@ -95,7 +95,7 @@ async function run() {
 
     app.post("/blog-editor", async (req, res) => {
   try {
-    const { title,category,imgUrl,shortDes,time,content } = req.body;
+    const { title,category,imgUrl,shortDes,time,content,readTime } = req.body;
 
     // Validate content
     if (!content || typeof content !== 'string' || !content.trim()) {
@@ -125,6 +125,8 @@ async function run() {
         shortDes: shortDes.trim(),
         time: time.trim(),
         no: Math.floor(Math.random() * 100),
+        readTime:`${readTime} min read`,
+        featured: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
