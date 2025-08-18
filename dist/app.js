@@ -27,6 +27,7 @@ app.use((0, cors_1.default)({
         `${process.env.ADMIN_URI}`,
         `${process.env.CLIENT_URI}`,
         `${process.env.CLIENT_URI2}`,
+        `${process.env.CLIENT_URI3}`,
     ],
     credentials: true,
 }));
@@ -98,7 +99,7 @@ function run() {
             };
             app.post("/blog-editor", (req, res) => __awaiter(this, void 0, void 0, function* () {
                 try {
-                    const { content } = req.body;
+                    const { title, category, imgUrl, shortDes, time, content, readTime } = req.body;
                     // Validate content
                     if (!content || typeof content !== 'string' || !content.trim()) {
                         return res.status(400).json({
@@ -118,6 +119,14 @@ function run() {
                     // Insert into database (assuming blogs is your MongoDB collection)
                     const result = yield blogs.insertOne({
                         des: safeContent,
+                        title: title.trim(),
+                        category: category.trim(),
+                        imgUrl: imgUrl.trim(),
+                        shortDes: shortDes.trim(),
+                        time: time.trim(),
+                        no: Math.floor(Math.random() * 100),
+                        readTime: `${readTime} min read`,
+                        featured: false,
                         createdAt: new Date(),
                         updatedAt: new Date(),
                     });

@@ -16,6 +16,7 @@ app.use(
       `${process.env.ADMIN_URI}`,
       `${process.env.CLIENT_URI}`,
       `${process.env.CLIENT_URI2}`,
+      `${process.env.CLIENT_URI3}`,
     ],
     credentials: true,
   }),
