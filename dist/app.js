@@ -28,6 +28,7 @@ app.use((0, cors_1.default)({
         `${process.env.CLIENT_URI}`,
         `${process.env.CLIENT_URI2}`,
         `${process.env.CLIENT_URI3}`,
+        `${process.env.CLIENT_URI4}`,
     ],
     credentials: true,
 }));
@@ -373,6 +374,39 @@ function run() {
                     res.json({
                         success: true,
                         message: `Email sent successfully to ${process.env.USER}.`,
+                    });
+                }
+                catch (error) {
+                    res.json({
+                        success: false,
+                        message: `Email could not sent. Please try again.`,
+                    });
+                }
+            }));
+            app.post('/send-mails', (req, res) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const mails = req.body;
+                    // console.log({ mails });
+                    const transporter = nodemailer.createTransport({
+                        host: 'smtp.gmail.com',
+                        service: 'gmail',
+                        port: 587,
+                        secure: false,
+                        auth: {
+                            user: process.env.USER1,
+                            pass: process.env.PASS1,
+                        },
+                    });
+                    yield transporter.sendMail({
+                        from: `${mails.name} <${process.env.USER1}> `,
+                        replyTo: mails.email,
+                        to: process.env.USER1,
+                        subject: mails.subject,
+                        text: mails.message,
+                    });
+                    res.json({
+                        success: true,
+                        message: `Email sent successfully to ${process.env.USER1}.`,
                     });
                 }
                 catch (error) {

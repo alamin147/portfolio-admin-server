@@ -17,6 +17,7 @@ app.use(
       `${process.env.CLIENT_URI}`,
       `${process.env.CLIENT_URI2}`,
       `${process.env.CLIENT_URI3}`,
+      `${process.env.CLIENT_URI4}`,
     ],
     credentials: true,
   }),
@@ -416,6 +417,40 @@ app.post('/blog/love/:id', async (req, res) => {
         res.json({
           success: true,
           message: `Email sent successfully to ${process.env.USER}.`,
+        });
+      } catch (error) {
+        res.json({
+          success: false,
+          message: `Email could not sent. Please try again.`,
+        });
+      }
+    });
+    app.post('/send-mails', async (req, res) => {
+      try {
+        const mails: TInputs = req.body;
+        // console.log({ mails });
+        const transporter = nodemailer.createTransport({
+          host: 'smtp.gmail.com',
+          service: 'gmail',
+          port: 587,
+          secure: false,
+          auth: {
+            user: process.env.USER1,
+            pass: process.env.PASS1,
+          },
+        });
+
+        await transporter.sendMail({
+          from: `${mails.name} <${process.env.USER1}> `,
+          replyTo: mails.email,
+          to: process.env.USER1,
+          subject: mails.subject,
+          text: mails.message,
+        });
+
+        res.json({
+          success: true,
+          message: `Email sent successfully to ${process.env.USER1}.`,
         });
       } catch (error) {
         res.json({
