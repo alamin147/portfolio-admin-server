@@ -1,0 +1,345 @@
+{
+  "about": "I am Al Amin, a Computer Science and Engineering graduate from Daffodil International University (DIU), specializing in MERN stack development. I build fast, scalable, and user-friendly web applications from concept to deployment. I also actively practice competitive programming to strengthen my problem-solving skills and aim to create efficient and impactful software solutions. I have experience in real-world systems, AI-based applications, and modern deployment pipelines.",
+
+  "expertise": [
+    "Full Stack Web Development",
+    "MERN Stack Development",
+    "Backend Development",
+    "Frontend Development",
+    "Database Design & Optimization",
+    "Artificial Intelligence",
+    "Machine Learning",
+    "REST API Development",
+    "Authentication & Security (JWT)",
+    "System Design & Scalability",
+    "Competitive Programming"
+  ],
+
+  "skills": [
+    {
+      "name": "Mongoose",
+      "category": "Database ORM"
+    },
+    {
+      "name": "Express.js",
+      "category": "Backend Framework"
+    },
+    {
+      "name": "MongoDB",
+      "category": "Database"
+    },
+    {
+      "name": "Node.js",
+      "category": "Runtime"
+    },
+    {
+      "name": "PostgreSQL",
+      "category": "Database"
+    },
+    {
+      "name": "Prisma",
+      "category": "ORM"
+    },
+    {
+      "name": "TypeScript",
+      "category": "Programming Language"
+    },
+    {
+      "name": "JavaScript",
+      "category": "Programming Language"
+    },
+    {
+      "name": "React",
+      "category": "Frontend Framework"
+    },
+    {
+      "name": "Redux Toolkit",
+      "category": "State Management"
+    },
+    {
+      "name": "TailwindCSS",
+      "category": "CSS Framework"
+    },
+    {
+      "name": "C",
+      "category": "Programming Language"
+    },
+    {
+      "name": "C++",
+      "category": "Programming Language"
+    },
+    {
+      "name": "HTML",
+      "category": "Markup Language"
+    },
+    {
+      "name": "CSS",
+      "category": "Style Sheet Language"
+    }
+  ],
+  "Other skills": [
+    {
+      "name": "Vercel",
+      "category": "Deployment"
+    },
+    {
+      "name": "Cloudinary",
+      "category": "Media Management"
+    },
+    {
+      "name": "Git & GitHub",
+      "category": "Version Control"
+    }
+  ],
+  "projects": [
+    {
+      "name": "N-Streaming (Video Streaming Platform)",
+      "description": "A modern MERN-based video streaming platform with video upload, adaptive playback, watch history, bookmarking, and content moderation features.",
+      "tech": [
+        "React",
+        "TypeScript",
+        "Redux Toolkit",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "Mongoose",
+        "TailwindCSS"
+      ],
+      "live": "https://n-streaming.vercel.app/",
+      "github": "https://github.com/alamin147/streaming-app",
+      "featured": true
+    },
+    {
+      "name": "Lost & Found Management System",
+      "description": "A platform for reporting and recovering lost items with role-based access, authentication, and structured item tracking system.",
+      "tech": [
+        "React",
+        "TypeScript",
+        "Redux Toolkit",
+        "Node.js",
+        "Express.js",
+        "PostgreSQL",
+        "Prisma",
+        "TailwindCSS"
+      ],
+      "live": "https://lost-and-found-rust.vercel.app",
+      "github": "https://github.com/alamin147/lost-and-found",
+      "featured": true
+    },
+    {
+      "name": "Flurry Tasks (Task Management System)",
+      "description": "A task management platform with drag-and-drop support, task sharing, dynamic status updates, and real-time collaboration features.",
+      "tech": [
+        "React",
+        "TypeScript",
+        "Redux Toolkit",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "Mongoose",
+        "TailwindCSS"
+      ],
+      "live": "https://task-management-client-zeta.vercel.app",
+      "github": "https://github.com/alamin147/task-management",
+      "featured": true
+    },
+    {
+      "name": "ChopStick House",
+      "description": "A restaurant management system where users can order food and chefs can manage menus dynamically.",
+      "tech": ["React", "Node.js", "Express.js", "MongoDB"],
+      "live": "https://chopstick-f4d2e.web.app/",
+      "github": "https://github.com/alamin147/chopstick"
+    },
+    {
+      "name": "Wonder Spark Toy Store",
+      "description": "An online toy marketplace with multi-role system including customers, vendors, and admins.",
+      "tech": ["React", "Node.js", "Express.js", "MongoDB", "TailwindCSS"],
+      "live": "https://wonder-spark--toys.web.app",
+      "github": "https://github.com/alamin147/toy-management-frontend"
+    },
+    {
+      "name": "String Symphony",
+      "description": "An online course platform where users can purchase music lessons and access content.",
+      "tech": ["React", "Node.js", "Express.js", "MongoDB", "TailwindCSS"],
+      "live": "https://string-symphony.web.app",
+      "github": "https://github.com/alamin147/school-management-frontend"
+    },
+    {
+      "name": "Gadget Shop",
+      "description": "An e-commerce platform for browsing and purchasing gadgets.",
+      "tech": ["React", "Node.js", "Express.js", "MongoDB", "TailwindCSS"],
+      "live": "https://gadgets-client-side.vercel.app",
+      "github": "https://github.com/alamin147/gadget-management-frontend"
+    },
+    {
+      "name": "Todo List App",
+      "description": "A simple todo application for managing daily tasks.",
+      "tech": ["React"],
+      "live": "https://react-todo-app-eight-liard.vercel.app",
+      "github": "https://github.com/alamin147/todo-app"
+    }
+  ],
+
+  "blogs": [
+    {
+      "title": "MongoDB as a NoSQL Database",
+      "category": "Database",
+      "summary": "MongoDB is a flexible NoSQL database with dynamic schemas for handling unstructured data efficiently."
+    },
+    {
+      "title": "Postgres SQL",
+      "category": "Database",
+      "summary": "Postgres is a powerful relational database with strong ACID compliance and advanced query capabilities."
+    },
+    {
+      "title": "Express JS on Node JS",
+      "category": "Backend Development",
+      "summary": "Using Express.js to build scalable and efficient backend applications with Node.js."
+    },
+    {
+      "title": "Deploy MERN App in Vercel",
+      "category": "Deployment",
+      "summary": "Step-by-step guide to deploying MERN stack applications using Vercel."
+    },
+    {
+      "title": "GitHub Cheatsheet",
+      "category": "Version Control",
+      "summary": "Essential Git commands for branching, merging, and repository management."
+    },
+    {
+      "title": "Docker Cheatsheet",
+      "category": "Tools & Productivity",
+      "summary": "Useful Docker commands for managing containers, images, and environments."
+    }
+  ],
+
+  "cpProfiles": [
+    {
+      "platform": "Codeforces",
+      "username": "alamin147",
+      "rating": "985",
+      "highestRating": "1079",
+      "solved": "677",
+      "rank": "Newbie",
+      "profile": "https://codeforces.com/profile/alamin147"
+    },
+    {
+      "platform": "LeetCode",
+      "username": "alamin14",
+      "rating": "1601",
+      "highestRating": "1601",
+      "solved": "186",
+      "profile": "https://leetcode.com/u/alamin14/"
+    },
+    {
+      "platform": "CodeChef",
+      "username": "alamin14780",
+      "rating": "1499",
+      "highestRating": "1539",
+      "solved": "129",
+      "rank": "2★",
+      "profile": "https://www.codechef.com/users/alamin14780"
+    },
+    {
+      "platform": "Beecrowd",
+      "username": "aamin60",
+      "solved": "185",
+      "profile": "https://www.beecrowd.com.br/judge/en/profile/635318"
+    },
+    {
+      "platform": "HackerRank",
+      "username": "alamin_14780",
+      "solved": "42",
+      "rank": "5★ in C++",
+      "profile": "https://www.hackerrank.com/profile/alamin_14780"
+    }
+  ],
+
+  "services": [
+    "Full Stack Web Application Development",
+    "Custom MERN Stack Solutions",
+    "REST API Development",
+    "Database Design & Optimization",
+    "Authentication & Authorization (JWT)",
+    "Responsive UI Development",
+    "AI & Machine Learning Solutions",
+    "Deployment (Vercel, Cloudinary)",
+    "Performance Optimization & Debugging"
+  ],
+
+  "contact": {
+    "email": "alamin.14780@gmail.com",
+    "github": "https://github.com/alamin147",
+    "linkedin": "https://linkedin.com/in/alamin27"
+  },
+  "research_experience": {
+      "focus_areas": [
+        "Artificial Intelligence",
+        "Machine Learning",
+        "Deep Learning",
+        "Transfer Learning",
+        "Multimodal Systems",
+        "Image Classification",
+        "AI-based Detection Systems"
+      ]
+    },
+    "publications": [
+      {
+        "title": "Cross-Modal Alignment for Detecting AI-Generated Review",
+        "status": "Under review at DCS-CI 2026",
+        "description": "A multimodal framework combining text and image embeddings to detect AI-generated content by identifying inconsistencies.",
+        "methodology": "Combines BERT and CLIP embeddings with cosine similarity.",
+        "dataset": "AiGen-FoodReview dataset",
+        "performance_metrics": {
+          "accuracy": "99.96%",
+          "auc_roc": "Perfect (100%)"
+        }
+      }
+    ],
+    "academic_details": {
+      "thesis": {
+        "title": "Identifying 24 rare fruits of southern Bangladesh",
+        "models_used": [
+          "CNN",
+          "VGG-16",
+          "ResNet-50",
+          "EfficientNet"
+        ],
+        "techniques": [
+          "Optimized transfer learning"
+        ],
+        "performance_metrics": {
+          "accuracy": "89.79%"
+        }
+      }
+    },
+    "Research projects": [
+      {
+        "name": "Chronic Kidney Disease (CKD) Prediction System",
+        "type": "Medical prediction system",
+        "techniques_used": [
+          "Preprocessing",
+          "SMOTE",
+          "Feature selection"
+        ],
+        "performance_metrics": {
+          "max_accuracy": "99.17%",
+          "cross_validation_accuracy": "98%"
+        }
+      },
+      {
+        "name": "Tomato Plant Disease Detection",
+        "type": "Agriculture AI project",
+        "models_used": [
+          "CNN"
+        ],
+        "dataset_details": {
+          "size": "36,000+ images",
+          "classes": 10
+        },
+        "performance_metrics": {
+          "training_and_validation_accuracy": "98.6%"
+        }
+      }
+    ]
+}

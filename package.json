@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node-dev --respawn --transpile-only src/server.ts",
     "start:prod": "node ./dist/server.js",
-    "build": "tsc",
+    "build": "tsc && mkdir -p dist/data && cp src/data/portfolio.json dist/data/portfolio.json",
     "lint": "eslint src --ignore-path .eslintignore --ext .ts",
     "fix": "npx eslint src --fix",
     "format": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",

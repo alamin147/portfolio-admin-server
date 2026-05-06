@@ -3,6 +3,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import dotenv from 'dotenv';
+import portfolioData from './data/portfolio.json';
 const app: Application = express();
 const nodemailer = require('nodemailer');
 
@@ -22,8 +23,14 @@ app.use(
     credentials: true,
   }),
 );
-
-
+/////////////////////////////////////this was added last
+// Security headers
+app.use((req: Request, res: Response, next) => {
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+  next();
+});
+//////////////////////////////////////////////
 app.get('/', (req: Request, res: Response) => {
   res.json({
     status: 200,
@@ -82,7 +89,7 @@ async function run() {
     'p', 'br', 'strong', 'em', 'u', 's',
     'ol', 'ul', 'li',
     'blockquote', 'code', 'pre',
-    'a', 'img'
+    'a', 'img', 'span'
   ],
   allowedAttributes: {
     'a': ['href', 'target'],
@@ -90,70 +97,132 @@ async function run() {
     '*': ['class', 'style'] // Be careful with style attribute
   },
   allowedSchemes: ['http', 'https', 'mailto'],
+  allowedStyles: {
+    '*': {
+      color: [
+        /^#[0-9a-fA-F]{3,8}$/,
+        /^rgb\((\s*\d+\s*,){2}\s*\d+\s*\)$/,
+        /^rgba\((\s*\d+\s*,){3}\s*(0|1|0?\.\d+)\s*\)$/
+      ],
+      'background-color': [
+        /^#[0-9a-fA-F]{3,8}$/,
+        /^rgb\((\s*\d+\s*,){2}\s*\d+\s*\)$/,
+        /^rgba\((\s*\d+\s*,){3}\s*(0|1|0?\.\d+)\s*\)$/
+      ]
+    }
+  },
   allowedSchemesByTag: {
     img: ['http', 'https', 'data']
   }
     };
 
-    app.post("/blog-editor", async (req, res) => {
-  try {
-    const { title,category,imgUrl,shortDes,time,content,readTime } = req.body;
+    app.post('/blog-editor', async (req, res) => {
+      try {
+        const {
+          title,
+          category,
+          imgUrl,
+          shortDes,
+          content,
+          readTime,
+          author,
+          featured,
+          tags,
+        } = req.body;
 
-    // Validate content
-    if (!content || typeof content !== 'string' || !content.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Content is required and must be a non-empty string"
-      });
-    }
+        // Basic validation for required string fields
+        if (!title || typeof title !== 'string' || !title.trim()) {
+          return res.status(400).json({
+            success: false,
+            message: 'Title is required and must be a non-empty string',
+          });
+        }
 
-    // Sanitize HTML to prevent XSS
-    const safeContent = sanitizeHtml(content.trim(), sanitizeOptions);
+        if (!category || typeof category !== 'string' || !category.trim()) {
+          return res.status(400).json({
+            success: false,
+            message: 'Category is required and must be a non-empty string',
+          });
+        }
 
-    // Validate sanitized content isn't empty
-    if (!safeContent.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Content contains no valid HTML elements"
-      });
-    }
+        // Validate content
+        if (!content || typeof content !== 'string' || !content.trim()) {
+          return res.status(400).json({
+            success: false,
+            message: 'Content is required and must be a non-empty string',
+          });
+        }
 
-    // Insert into database (assuming blogs is your MongoDB collection)
-    const result = await blogs.insertOne({
-      des: safeContent,
-      title: title.trim(),
-      category: category.trim(),
-        imgUrl: imgUrl.trim(),
-        shortDes: shortDes.trim(),
-        time: time.trim(),
-        no: Math.floor(Math.random() * 100),
-        readTime:`${readTime} min read`,
-        featured: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+        // Sanitize HTML to prevent XSS
+        const safeContent = sanitizeHtml(content.trim(), sanitizeOptions);
 
-    // Check if insertion was successful
-    if (!result.insertedId) {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to save blog post"
-      });
-    }
+        // Validate sanitized content isn't empty
+        if (!safeContent.trim()) {
+          return res.status(400).json({
+            success: false,
+            message: 'Content contains no valid HTML elements',
+          });
+        }
 
-    res.status(201).json({
-      success: true,
-      message: "Blog post created successfully",
-      blogId: result.insertedId
-    });
+        const now = new Date();
 
-  } catch (error) {
-    console.error("Error creating blog post:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error"
-    });
-  }
+        const doc: any = {
+          des: safeContent,
+          title: title.trim(),
+          category: category.trim(),
+          imgUrl:
+            typeof imgUrl === 'string'
+              ? imgUrl.trim()
+              : '',
+          shortDes:
+            typeof shortDes === 'string'
+              ? shortDes.trim()
+              : '',
+          // Use server time to keep a consistent format
+          time: now.toISOString(),
+          // Keep existing UI expectation: "5 min read"
+          readTime:
+            typeof readTime === 'string' && readTime.trim()
+              ? `${readTime.trim()} min read`
+              : '5 min read',
+          // Simple ordering field, larger = newer
+          no: now.getTime(),
+          featured: Boolean(featured),
+          author:
+            typeof author === 'string' && author.trim()
+              ? author.trim()
+              : 'Al Amin',
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        if (Array.isArray(tags)) {
+          doc.tags = tags
+            .map((t) => (typeof t === 'string' ? t.trim() : ''))
+            .filter((t) => t.length > 0);
+        }
+
+        const result = await blogs.insertOne(doc);
+
+        if (!result.insertedId) {
+          return res.status(500).json({
+            success: false,
+            message: 'Failed to save blog post',
+          });
+        }
+
+        res.status(201).json({
+          success: true,
+          message: 'Blog post created successfully',
+          blogId: result.insertedId,
+        });
+      } catch (error) {
+        console.error('Error creating blog post:', error);
+        res.status(500).json({
+          success: false,
+          message: 'Internal server error',
+        });
+      }
     });
 
     app.post('/blog', async (req, res) => {
@@ -459,6 +528,124 @@ app.post('/blog/love/:id', async (req, res) => {
         });
       }
     });
+
+
+    /////////// ai///////////////
+    app.post('/api/chat', async (req: Request, res: Response) => {
+
+        try {
+          const geminiApiKey = process.env.GOOGLE_GEMINI_API_KEY;
+          const groqApiKey = process.env.GROQ_API_KEY;
+
+          if (!geminiApiKey && !groqApiKey) {
+            return res.status(503).json({
+              message: 'Chat is not configured on the server yet.',
+            });
+          }
+
+          const body = req.body as { message?: unknown };
+          const userText = typeof body.message === 'string' ? body.message.trim() : '';
+          if (!userText) {
+            return res.status(400).json({
+              message: 'Expected a non-empty message string.',
+            });
+          }
+
+          const portfolioText = JSON.stringify(portfolioData, null, 2);
+          const systemInstruction = `You are a helpful assistant for Al Amin's portfolio website. Answer using ONLY the JSON data below. If something is not in the data, say the portfolio does not list that information — do not invent facts. Keep answers concise and friendly.
+
+         Portfolio data (JSON):
+         ${portfolioText}`;
+
+          if (geminiApiKey) {
+            const models = [
+              process.env.GEMINI_MODEL,
+              'gemini-2.0-flash-lite',
+            ].filter((model): model is string => Boolean(model));
+
+            for (const model of models) {
+              const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(geminiApiKey)}`;
+
+              const geminiRes = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  systemInstruction: {
+                    parts: [{ text: systemInstruction }],
+                  },
+                  contents: [
+                    {
+                      role: 'user',
+                      parts: [{ text: userText }],
+                    },
+                  ],
+                }),
+              });
+
+              if (!geminiRes.ok) {
+                const errText = await geminiRes.text();
+                console.error('Gemini API error', model, geminiRes.status, errText);
+                continue;
+              }
+
+              const data = (await geminiRes.json()) as {
+                candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+              };
+              const reply =
+                data.candidates?.[0]?.content?.parts
+                  ?.map((part) => part.text ?? '')
+                  .join('')
+                  .trim() ?? '';
+
+              if (reply) {
+                return res.json({ message: reply });
+              }
+            }
+          }
+
+          if (groqApiKey) {
+            const groqModel = process.env.GROQ_MODEL ?? 'llama-3.1-8b-instant';
+            const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${groqApiKey}`,
+              },
+              body: JSON.stringify({
+                model: groqModel,
+                messages: [
+                  { role: 'system', content: systemInstruction },
+                  { role: 'user', content: userText },
+                ],
+                temperature: 0.2,
+              }),
+            });
+
+            if (groqRes.ok) {
+              const data = (await groqRes.json()) as {
+                choices?: Array<{ message?: { content?: string } }>;
+              };
+              const reply = data.choices?.[0]?.message?.content?.trim() ?? '';
+              if (reply) {
+                return res.json({ message: reply });
+              }
+            } else {
+              const errText = await groqRes.text();
+              console.error('Groq API error', groqRes.status, errText);
+            }
+          }
+
+          return res.json({
+            message: 'Free AI quota is currently unavailable. Please try again later.',
+          });
+        } catch (err) {
+          console.error('[api/chat] Unhandled error', err);
+          return res.status(500).json({
+            message: 'Internal server error.',
+          });
+        }
+      });
+
   } finally {
   }
 }
