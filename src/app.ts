@@ -25,11 +25,11 @@ app.use(
 );
 /////////////////////////////////////this was added last
 // Security headers
-app.use((req: Request, res: Response, next) => {
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
-  next();
-});
+// app.use((req: Request, res: Response, next) => {
+//   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+//   res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+//   next();
+// });
 //////////////////////////////////////////////
 app.get('/', (req: Request, res: Response) => {
   res.json({
