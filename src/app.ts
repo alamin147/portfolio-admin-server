@@ -49,6 +49,8 @@ const client = new MongoClient(uri, {
   },
 });
 
+const loginAttempts = new Map<string, { count: number; blockedUntil: number }>();
+
 async function run() {
   try {
     const users = client.db('portfolio-admin-server').collection('users');
@@ -359,17 +361,32 @@ async function run() {
     // });
     // user
     app.post('/login', async (req, res) => {
-      const userData = req.body;
-      console.log(userData);
-      // username, password
-      const user = await users.findOne({ username: userData?.username });
-      if (!user) {
-        return res.send({ error: 404, message: 'user not found' });
+      const ip =
+        (typeof req.headers['x-forwarded-for'] === 'string'
+          ? req.headers['x-forwarded-for'].split(',')[0]
+          : req.socket.remoteAddress) ?? 'unknown';
+
+      const now = Date.now();
+      const record = loginAttempts.get(ip) ?? { count: 0, blockedUntil: 0 };
+
+      if (record.blockedUntil > now) {
+        return res.status(401).json({ error: 401, message: 'Invalid credentials' });
       }
 
-      if (userData.password !== user.password) {
-        return res.send({ error: 404, message: 'wrong password' });
+      const userData = req.body;
+      const user = await users.findOne({ username: userData?.username });
+
+      if (!user || userData.password !== user.password) {
+        record.count += 1;
+        if (record.count >= 3) {
+          record.blockedUntil = now + 60 * 60 * 1000;
+          record.count = 0;
+        }
+        loginAttempts.set(ip, record);
+        return res.status(401).json({ error: 401, message: 'Invalid credentials' });
       }
+
+      loginAttempts.delete(ip);
 
       const userPayload = {
         _id: user?._id,
